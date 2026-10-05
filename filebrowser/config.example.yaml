@@ -1,0 +1,61 @@
+# FileBrowser Quantum 1.5.8-stable 설정.
+# 서버에서 config.yaml 로 복사해서 사용한다 (git에 올라가지 않음).
+#   cp filebrowser/config.example.yaml filebrowser/config.yaml
+# 키 이름이 틀리면 Quantum이 시작되지 않는다 (알 수 없는 키 거부).
+#
+# 서명 키(auth.key)는 여기에 쓰지 않고 .env 의 FILEBROWSER_JWT_TOKEN_SECRET 으로 넣는다.
+# 비워 두면 재시작 후 빈 키로 서명되어 토큰 위조가 가능하다 (GHSA-8f9r-wg7w-pfw8).
+
+server:
+  port: 80                       # 컨테이너 내부 포트. 외부 노출은 docker-compose 에서 127.0.0.1:8085 로만
+  listen: "0.0.0.0"
+  baseURL: "/"
+  externalUrl: "https://nas.example.com"
+  disableWebDAV: true
+  disableUpdateCheck: true
+  logging:
+    - levels: "info|warning|error"
+  sources:
+    - path: "/srv"
+      name: "files"              # 게이트웨이 암호화 보관함(vault.js SOURCE)과 같아야 한다
+      config:
+        defaultEnabled: true
+        defaultUserScope: "/users"
+        createUserDir: true      # 새 사용자는 /users/<이름> 폴더만 보인다
+
+http:
+  trustedHeaders:                # 클라이언트 IP 판단용 (Nginx가 $remote_addr 로 덮어씀)
+    - "X-Forwarded-For"
+
+auth:
+  adminUsername: "owner"         # 이 이름의 proxy 사용자가 관리자가 된다. 게이트웨이의 개인 계정 이름과 같게
+  tokenExpirationHours: 2
+  methods:
+    noauth: false
+    password:
+      enabled: false             # 기본값이 true 라서 반드시 끈다
+      signup: false
+    passkey:
+      enabled: false
+    proxy:
+      enabled: true
+      header: "X-Username"
+      logoutRedirectUrl: "https://nas.example.com/_gw/logout"
+
+frontend:
+  name: "NAS"
+  disablePWAInstall: true
+
+userDefaults:
+  listing:
+    deleteWithoutConfirming: false
+  account:
+    permissions:
+      admin: false
+      api: false                 # API 토큰 발급 금지
+      share: false               # 공유 링크는 관리자(owner)만
+      modify: true
+      create: true
+      delete: true
+      download: true
+      realtime: false

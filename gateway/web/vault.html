@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>암호화 보관함</title>
+  <link rel="stylesheet" href="/_gw/static/gw.css">
+  <script src="/_gw/static/vault.js" defer></script>
+</head>
+<body class="gw-center">
+  <main class="gw-card wide">
+    <h1>암호화 보관함</h1>
+    <p class="gw-note">
+      파일은 이 브라우저 안에서 암호화된 뒤 업로드되고, 비밀번호는 서버로 전송되지 않습니다.
+      <strong>비밀번호를 잊으면 누구도 복구할 수 없습니다.</strong>
+      암호화된 파일(<code>.age</code>)은 PC에서 <code>age -d</code> 명령으로도 풀 수 있습니다.
+    </p>
+
+    <h2>폴더</h2>
+    <div class="gw-row">
+      <code id="cwd">/</code>
+      <button type="button" class="secondary" id="up">상위 폴더</button>
+    </div>
+    <ul class="gw-list" id="listing"></ul>
+
+    <label>비밀번호
+      <input type="password" id="pass" autocomplete="off" spellcheck="false">
+    </label>
+
+    <h2>암호화해서 올리기</h2>
+    <label>파일 (현재 폴더에 <code>원래이름.age</code>로 저장)
+      <input type="file" id="file">
+    </label>
+    <label>비밀번호 확인 (암호화할 때만)
+      <input type="password" id="pass2" autocomplete="off" spellcheck="false">
+    </label>
+    <button type="button" id="encrypt">암호화 후 업로드</button>
+
+    <h2>풀어서 내려받기</h2>
+    <p class="gw-note" id="selected">위 목록에서 .age 파일을 선택하세요.</p>
+    <button type="button" id="decrypt" disabled>복호화 후 다운로드</button>
+
+    <progress class="gw-progress" id="progress" max="1" value="0" hidden></progress>
+    <p class="gw-note" id="status" role="status"></p>
+    <a class="gw-link" href="/">파일 목록으로 돌아가기</a>
+  </main>
+</body>
+</html>

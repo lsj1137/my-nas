@@ -1,0 +1,24 @@
+# 서버에서 config.yaml 로 복사해서 사용한다. config.yaml 은 git에 올라가지 않는다.
+#   cp gateway/config.example.yaml gateway/config.yaml
+
+# 외부에서 접속하는 주소 (로그인 요청의 Origin 검사, 쿠키 처리에 사용)
+public_origin: https://nas.example.com
+
+session:
+  idle_timeout: 168h      # 7일 동안 사용하지 않으면 만료
+  absolute_timeout: 720h  # 로그인 후 최대 30일
+
+# 위에서부터 처음 일치하는 항목을 사용한다.
+# 실제로 찍히는 IP는 Nginx 접속 로그(/var/log/nginx/access.log)에서 확인해서 넣는다.
+# 개인(관리자) 계정은 본인만 쓰는 네트워크에만 매핑한다.
+ip_map:
+  - cidr: 192.168.0.0/24
+    user: shared
+
+# 사용자 이름: 영문 소문자, 숫자, . _ - 만 사용 (최대 32자). "admin"은 사용할 수 없다.
+# 비밀번호 해시 생성: docker compose run --rm -it nas-gateway hash-password
+users:
+  owner:
+    password_hash: "$2a$12$REPLACE_WITH_HASH"
+  shared:
+    login: false  # IP 매핑 전용 (비밀번호 로그인 불가)

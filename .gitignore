@@ -1,0 +1,12 @@
+# 서버 전용 설정 (계정, 비밀번호 해시, IP, 도메인, 비밀 키)
+.env
+gateway/config.yaml
+gateway/custom/
+filebrowser/config.yaml
+
+# 런타임 데이터 (Quantum DB, 캐시)
+filebrowser/data/
+
+# 로컬 도구
+.agent-workspace/
+.local-test/

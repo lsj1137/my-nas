@@ -1,0 +1,31 @@
+<!doctype html>
+<!--
+  기본 로그인 페이지. 직접 디자인한 페이지로 바꾸려면 config/custom/login.html 에 두면 된다.
+  지켜야 할 규칙:
+    - <form method="post" action="/_gw/login"> 로 username, password 필드를 보낸다.
+    - 로그인 실패 시 /_gw/login?error=1 로 돌아온다.
+    - 인라인 스크립트/스타일은 CSP로 막혀 있으므로 /_gw/static/ 아래 파일로 분리한다.
+-->
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NAS 로그인</title>
+  <link rel="stylesheet" href="/_gw/static/gw.css">
+  <script src="/_gw/static/login.js" defer></script>
+</head>
+<body class="gw-center">
+  <form class="gw-card" method="post" action="/_gw/login">
+    <h1>NAS</h1>
+    <p id="gw-error" class="gw-error" hidden>아이디 또는 비밀번호가 올바르지 않습니다.</p>
+    <label>아이디
+      <input name="username" autocomplete="username" required autofocus>
+    </label>
+    <label>비밀번호
+      <input name="password" type="password" autocomplete="current-password" required>
+    </label>
+    <button type="submit">로그인</button>
+    <a id="gw-back" class="gw-link" href="/" hidden>로그인하지 않고 돌아가기</a>
+  </form>
+</body>
+</html>

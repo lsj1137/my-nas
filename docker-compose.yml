@@ -1,0 +1,30 @@
+services:
+  filebrowser:
+    # stable 채널 버전 고정 (태그 + digest). 업데이트는 보안 권고 확인 후 계획적으로.
+    image: gtstef/filebrowser:1.5.8-stable@sha256:68455d4953bad8e984e1bc5d112ed1e9c918a0a04f104c13c9ece50790308894
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8085:80"      # 외부 노출 금지 (X-Username 헤더를 그대로 믿음)
+    environment:
+      FILEBROWSER_JWT_TOKEN_SECRET: ${FILEBROWSER_JWT_TOKEN_SECRET:?set FILEBROWSER_JWT_TOKEN_SECRET in .env}
+    volumes:
+      - ${NAS_ROOT:-/srv/nas}:/srv
+      - ./filebrowser/data:/home/filebrowser/data
+      - ./filebrowser/config.yaml:/home/filebrowser/data/config.yaml
+    logging: &logging
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  nas-gateway:
+    build: ./gateway
+    image: nas-gateway:local
+    restart: unless-stopped
+    command: ["-listen", "0.0.0.0:8086"]
+    ports:
+      - "127.0.0.1:8086:8086"    # 외부 노출 금지 (X-Real-IP 헤더를 그대로 믿음)
+    volumes:
+      - ./gateway/config.yaml:/config/config.yaml:ro
+      - ./gateway/custom:/config/custom:ro
+    logging: *logging

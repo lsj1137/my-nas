@@ -1,0 +1,68 @@
+#nas-overlay {
+  position: fixed;
+  left: 12px;
+  bottom: 12px;
+  z-index: 2147483000;
+  font: 14px/1.4 system-ui, -apple-system, "Segoe UI", "Malgun Gothic", sans-serif;
+}
+
+#nas-overlay .nas-toggle {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(127, 127, 127, .35);
+  background: rgba(30, 30, 30, .85);
+  color: #fff;
+  cursor: pointer;
+}
+
+#nas-overlay .nas-menu {
+  display: none;
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 8px);
+  min-width: 200px;
+  padding: 6px;
+  border-radius: 10px;
+  border: 1px solid rgba(127, 127, 127, .35);
+  background: #1f2328;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .3);
+}
+
+#nas-overlay.open .nas-menu { display: flex; flex-direction: column; }
+
+#nas-overlay .nas-who {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 10px 8px;
+  color: #e6edf3;
+  border-bottom: 1px solid rgba(127, 127, 127, .3);
+  margin-bottom: 4px;
+}
+
+#nas-overlay .nas-who span { font-size: 12px; color: #9198a1; }
+
+#nas-overlay .nas-menu a,
+#nas-overlay .nas-menu button {
+  display: block;
+  text-align: left;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #e6edf3;
+  text-decoration: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+#nas-overlay .nas-menu a:hover,
+#nas-overlay .nas-menu button:hover { background: rgba(127, 127, 127, .2); }
+
+.nas-delete-warning {
+  margin: 10px 0 0;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: rgba(198, 40, 40, .12);
+  color: #c62828;
+  font-weight: 600;
+}
