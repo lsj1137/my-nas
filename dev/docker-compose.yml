@@ -21,7 +21,7 @@ services:
       - ../gateway/web:/web:ro
 
   nginx:
-    image: nginx:1.29-alpine
+    image: nginx:1.24-alpine   # 운영 서버(Ubuntu nginx 1.24)와 같은 버전
     depends_on: [filebrowser, nas-gateway]
     ports:
       - "127.0.0.1:8443:443"

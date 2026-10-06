@@ -108,6 +108,12 @@ sudo nginx -t && sudo systemctl reload nginx
 
 `nginx -t`가 실패하면 reload가 실행되지 않으므로 기존 서비스에는 영향이 없다.
 
+**reload 후에는 반드시 에러 로그를 확인한다.** `nginx -t`가 통과해도 실행 중인 설정과 충돌하면(예: `limit_req_zone`의 키 변경) reload가 `[emerg]`로 실패하고 예전 설정이 계속 돈다. `systemctl reload`는 이 경우에도 성공처럼 보인다.
+
+```bash
+sudo tail -3 /var/log/nginx/error.log   # 방금 시각의 [emerg] 가 없어야 함
+```
+
 ## 9. Quantum 초기 설정 (개인 계정으로)
 
 1. 개인 계정이 매핑된 네트워크에서 접속하거나, 로그인 페이지에서 개인 계정으로 로그인한다.
