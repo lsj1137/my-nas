@@ -13,7 +13,8 @@ let selected = null; // 복호화할 .age 파일 경로
 // ---- 상태 표시 ----
 function status(text, isError = false) {
   $("status").textContent = text;
-  $("status").classList.toggle("gw-error", isError);
+  $("status").classList.toggle("error", isError);
+  $("status").classList.toggle("ok", !isError && text.startsWith("완료"));
 }
 
 function progress(done, total) {
@@ -113,7 +114,7 @@ async function refresh() {
   try {
     data = await listDir(cwd);
   } catch (err) {
-    status(`폴더를 불러오지 못했습니다: ${err.message}`, true);
+    status(`불러오기 실패 (${err.message})`, true);
     return;
   }
   const folders = (data.folders || []).map((f) => f.name).sort();
@@ -121,7 +122,8 @@ async function refresh() {
 
   for (const name of folders) {
     const li = document.createElement("li");
-    li.textContent = `📁 ${name}`;
+    li.className = "folder";
+    li.textContent = name;
     li.addEventListener("click", () => {
       cwd = joinPath(cwd, name);
       select(null);
@@ -131,7 +133,8 @@ async function refresh() {
   }
   for (const name of ageFiles) {
     const li = document.createElement("li");
-    li.textContent = `🔒 ${name}`;
+    li.className = "locked";
+    li.textContent = name;
     li.addEventListener("click", () => {
       for (const other of list.children) other.classList.remove("selected");
       li.classList.add("selected");
@@ -141,16 +144,26 @@ async function refresh() {
   }
   if (!folders.length && !ageFiles.length) {
     const li = document.createElement("li");
-    li.textContent = "(하위 폴더와 암호화 파일 없음)";
+    li.className = "empty";
+    li.textContent = "비어 있음";
     list.append(li);
   }
 }
 
 function select(path) {
   selected = path;
-  $("selected").textContent = path ? `선택: ${path}` : "위 목록에서 .age 파일을 선택하세요.";
+  $("selected").textContent = path ? path.split("/").pop() : "선택된 파일 없음";
   $("decrypt").disabled = !path;
 }
+
+// ---- 파일 선택 영역 ----
+function showFileName() {
+  const file = $("file").files[0];
+  $("file-name").textContent = file ? file.name : "파일 선택";
+}
+$("file").addEventListener("change", showFileName);
+for (const type of ["dragenter", "dragover"]) $("drop").addEventListener(type, () => $("drop").classList.add("dragover"));
+for (const type of ["dragleave", "drop"]) $("drop").addEventListener(type, () => $("drop").classList.remove("dragover"));
 
 $("up").addEventListener("click", () => {
   cwd = cwd.replace(/\/[^/]+\/?$/, "") || "/";
@@ -162,23 +175,24 @@ $("up").addEventListener("click", () => {
 $("encrypt").addEventListener("click", async () => {
   const file = $("file").files[0];
   const pass = $("pass").value;
-  if (!file) return status("파일을 선택하세요.", true);
-  if (pass.length < MIN_PASSPHRASE) return status(`비밀번호는 ${MIN_PASSPHRASE}자 이상이어야 합니다.`, true);
-  if (pass !== $("pass2").value) return status("비밀번호 확인이 일치하지 않습니다.", true);
+  if (!file) return status("파일 없음", true);
+  if (pass.length < MIN_PASSPHRASE) return status(`비밀번호 ${MIN_PASSPHRASE}자 이상`, true);
+  if (pass !== $("pass2").value) return status("비밀번호 확인 불일치", true);
 
   busy(true);
   try {
-    status("암호화하는 중...");
+    status("암호화 중…");
     const encrypted = await runJob("encrypt", pass, file);
-    status("업로드하는 중...");
+    status("업로드 중…");
     progress(0, encrypted.size);
     await uploadBlob(joinPath(cwd, file.name + ".age"), encrypted);
-    status(`완료: ${file.name}.age`);
+    status("완료");
     $("file").value = "";
+    showFileName();
     $("pass2").value = "";
     await refresh();
   } catch (err) {
-    status(`실패: ${err.message.includes("409") ? "같은 이름의 파일이 이미 있습니다." : err.message}`, true);
+    status(`실패: ${err.message.includes("409") ? "같은 이름 있음" : err.message}`, true);
   } finally {
     progress(0, null);
     busy(false);
@@ -188,13 +202,13 @@ $("encrypt").addEventListener("click", async () => {
 // ---- 복호화 다운로드 ----
 $("decrypt").addEventListener("click", async () => {
   const pass = $("pass").value;
-  if (!selected || !pass) return status("파일과 비밀번호를 확인하세요.", true);
+  if (!selected || !pass) return status("파일·비밀번호 확인", true);
 
   busy(true);
   try {
-    status("내려받는 중...");
+    status("다운로드 중…");
     const encrypted = await downloadBlob(selected);
-    status("복호화하는 중...");
+    status("복호화 중…");
     const plain = await runJob("decrypt", pass, encrypted);
     const name = selected.split("/").pop().replace(/\.age$/, "");
     const url = URL.createObjectURL(plain);
@@ -205,10 +219,10 @@ $("decrypt").addEventListener("click", async () => {
     a.click();
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 60_000);
-    status(`완료: ${name}`);
+    status("완료");
   } catch (err) {
     const wrongPass = /no identity matched/i.test(err.message);
-    status(wrongPass ? "비밀번호가 맞지 않습니다." : `실패: ${err.message}`, true);
+    status(wrongPass ? "비밀번호 오류" : `실패: ${err.message}`, true);
   } finally {
     progress(0, null);
     busy(false);

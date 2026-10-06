@@ -1,0 +1,30 @@
+# 로컬 개발 환경: 운영과 같은 구성(Nginx + 게이트웨이 + Quantum)을 내 PC에서 띄운다.
+# 사용법은 dev/README.md
+name: my-nas-dev
+
+services:
+  filebrowser:
+    image: gtstef/filebrowser:1.5.8-stable@sha256:68455d4953bad8e984e1bc5d112ed1e9c918a0a04f104c13c9ece50790308894
+    environment:
+      FILEBROWSER_JWT_TOKEN_SECRET: dev-only-secret-not-for-production-0123456789abcdef0123456789
+    volumes:
+      - ./.generated/srv:/srv
+      - ./.generated/fbdata:/home/filebrowser/data
+
+  nas-gateway:
+    build: ../gateway
+    image: nas-gateway:dev
+    # -custom /web: gateway/web 폴더를 디스크에서 바로 읽는다 → HTML/CSS/JS는 저장 후 새로고침만 하면 반영
+    command: ["-listen", "0.0.0.0:8086", "-custom", "/web"]
+    volumes:
+      - ./gateway.yaml:/config/config.yaml:ro
+      - ../gateway/web:/web:ro
+
+  nginx:
+    image: nginx:1.29-alpine
+    depends_on: [filebrowser, nas-gateway]
+    ports:
+      - "127.0.0.1:8443:443"
+    volumes:
+      - ./.generated/nginx:/etc/nginx/conf.d:ro
+      - ./.generated/certs:/etc/letsencrypt/live/nas.localhost:ro

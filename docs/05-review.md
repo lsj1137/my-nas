@@ -22,6 +22,9 @@
 | A16 | Quantum 서명 키를 비우면 재시작 후 빈 키로 서명 → 토큰 위조 (GHSA-8f9r) | `.env`의 `FILEBROWSER_JWT_TOKEN_SECRET` 필수 (없으면 compose 실행 거부) | 04 |
 | A17 | Quantum은 `X-Forwarded-Host`, `X-Forwarded-Proto`를 그대로 믿음 (쿠키 Domain/Secure, 공유 URL) | Nginx가 모든 프록시 location에서 덮어씀 | nginx |
 | A18 | Quantum 비밀번호 로그인은 기본값이 켜짐 | 설정에서 명시적으로 끔 | filebrowser/config.example.yaml |
+| A20 | 로그인 시도 제한이 로그인 **페이지 열기(GET)**까지 세어서 새로고침 몇 번에 막힘 | POST만 세도록 변경 (`map $request_method`) | nginx/nas-http.conf |
+| A21 | Quantum 내장 로그인 제한(IP당 분당 10회)이 화면을 열 때마다 호출되는 `/api/auth/login`에 걸림. 집 안 기기는 모두 공유기 IP 하나로 보여 여럿이 쓰면 화면이 깨짐 | `http.disableRateLimit: true`. Quantum 비밀번호 로그인은 꺼져 있고 실제 로그인 제한은 Nginx + 게이트웨이가 담당 | filebrowser/config.example.yaml |
+| A22 | 예시 설정의 도메인(`nas.example.com`)이 서버 설정에 남아 로그아웃이 엉뚱한 주소로 이동 | Quantum 설정에서 도메인 제거 (`externalUrl` 없음, `logoutRedirectUrl: /_gw/logout`) | filebrowser/config.example.yaml |
 | A19 | `Referrer-Policy: no-referrer`면 브라우저가 폼 POST의 Origin을 `null`로 보내 정상 로그인이 Origin 검사에 막힘 (브라우저 테스트에서 발견) | `same-origin`으로 변경, 회귀 테스트 추가 | gateway/server.go |
 
 ## B. 결정 사항

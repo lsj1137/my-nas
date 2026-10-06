@@ -1,0 +1,11 @@
+{
+  "name": "my-nas-e2e",
+  "private": true,
+  "description": "로컬 개발 환경(https://nas.localhost:8443)을 실제 브라우저로 확인하는 E2E 테스트",
+  "scripts": {
+    "test": "node e2e.cjs"
+  },
+  "dependencies": {
+    "puppeteer-core": "^25.12.0"
+  }
+}

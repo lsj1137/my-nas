@@ -75,7 +75,7 @@ Quantum과 nas-gateway는 `X-Username`, `X-Real-IP` 헤더를 신뢰하므로 **
 
 | 경로 | 처리 |
 |---|---|
-| `/_gw/*` | nas-gateway (로그인 페이지 등 일부는 인증 없이 접근) |
+| `/_gw/*` | nas-gateway (로그인 페이지 등 일부는 인증 없이 접근). `/_gw/static/quantum.css`(Quantum 화면 테마)와 `overlay.js`(계정 메뉴)는 Nginx가 Quantum HTML에 끼워 넣음 |
 | `/_auth` | Nginx 내부 전용 (외부 요청 불가) |
 | `/public/` | 공유 링크. 인증 없이 Quantum으로 전달 (`X-Username`은 빈 값으로 덮어씀) |
 | 그 외 전체 | 인증 후 Quantum |

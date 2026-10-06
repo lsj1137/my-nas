@@ -10,7 +10,7 @@ server:
   port: 80                       # 컨테이너 내부 포트. 외부 노출은 docker-compose 에서 127.0.0.1:8085 로만
   listen: "0.0.0.0"
   baseURL: "/"
-  externalUrl: "https://nas.example.com"
+  # externalUrl은 비워 둔다. 공유 링크 주소는 Nginx가 넘겨주는 X-Forwarded-Host(실제 접속 도메인)로 만들어진다.
   disableWebDAV: true
   disableUpdateCheck: true
   logging:
@@ -26,6 +26,10 @@ server:
 http:
   trustedHeaders:                # 클라이언트 IP 판단용 (Nginx가 $remote_addr 로 덮어씀)
     - "X-Forwarded-For"
+  # Quantum 화면은 열 때마다 /api/auth/login 을 호출하는데, 내장 제한(IP당 분당 10회)에 걸리면 화면이 깨진다.
+  # 집 안 기기는 모두 공유기 IP 하나로 보이므로 여럿이 쓰면 쉽게 걸린다.
+  # Quantum 비밀번호 로그인은 꺼져 있고 실제 로그인 제한은 Nginx + 게이트웨이가 하므로 꺼도 안전하다.
+  disableRateLimit: true
 
 auth:
   adminUsername: "owner"         # 이 이름의 proxy 사용자가 관리자가 된다. 게이트웨이의 개인 계정 이름과 같게
@@ -40,7 +44,7 @@ auth:
     proxy:
       enabled: true
       header: "X-Username"
-      logoutRedirectUrl: "https://nas.example.com/_gw/logout"
+      logoutRedirectUrl: "/_gw/logout"   # 도메인 없이 경로만 (어느 도메인으로 접속해도 동작)
 
 frontend:
   name: "NAS"

@@ -3,46 +3,58 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>암호화 보관함</title>
+  <meta name="color-scheme" content="light dark">
+  <title>암호화 보관함 · My NAS</title>
   <link rel="stylesheet" href="/_gw/static/gw.css">
   <script src="/_gw/static/vault.js" defer></script>
 </head>
-<body class="gw-center">
-  <main class="gw-card wide">
-    <h1>암호화 보관함</h1>
-    <p class="gw-note">
-      파일은 이 브라우저 안에서 암호화된 뒤 업로드되고, 비밀번호는 서버로 전송되지 않습니다.
-      <strong>비밀번호를 잊으면 누구도 복구할 수 없습니다.</strong>
-      암호화된 파일(<code>.age</code>)은 PC에서 <code>age -d</code> 명령으로도 풀 수 있습니다.
-    </p>
+<body>
+  <main class="gw-page">
+    <header class="gw-header">
+      <h1>
+        <span class="gw-logo" aria-hidden="true">
+          <svg class="lucide lucide-lock" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><rect width="18" height="11" x="3" y="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+        </span>
+        보관함
+      </h1>
+      <a class="gw-btn secondary small" href="/">닫기</a>
+    </header>
 
-    <h2>폴더</h2>
-    <div class="gw-row">
-      <code id="cwd">/</code>
-      <button type="button" class="secondary" id="up">상위 폴더</button>
+    <p class="gw-alert">비밀번호 분실 시 복구 불가</p>
+
+    <section class="gw-card">
+      <div class="gw-path">
+        <span id="cwd">/</span>
+        <button type="button" class="gw-btn secondary small" id="up">상위</button>
+      </div>
+      <ul class="gw-list" id="listing"></ul>
+      <label class="gw-field">
+        <input type="password" id="pass" autocomplete="off" spellcheck="false" placeholder="비밀번호 (12자 이상)" aria-label="비밀번호">
+      </label>
+    </section>
+
+    <div class="gw-grid">
+      <section class="gw-card">
+        <h2>암호화 업로드</h2>
+        <label class="gw-drop" id="drop">
+          <input type="file" id="file">
+          <strong id="file-name">파일 선택</strong>
+        </label>
+        <label class="gw-field">
+          <input type="password" id="pass2" autocomplete="off" spellcheck="false" placeholder="비밀번호 확인" aria-label="비밀번호 확인">
+        </label>
+        <button type="button" class="gw-btn" id="encrypt">업로드</button>
+      </section>
+
+      <section class="gw-card">
+        <h2>복호화 다운로드</h2>
+        <p class="gw-note" id="selected">선택된 파일 없음</p>
+        <button type="button" class="gw-btn" id="decrypt" disabled>다운로드</button>
+      </section>
     </div>
-    <ul class="gw-list" id="listing"></ul>
-
-    <label>비밀번호
-      <input type="password" id="pass" autocomplete="off" spellcheck="false">
-    </label>
-
-    <h2>암호화해서 올리기</h2>
-    <label>파일 (현재 폴더에 <code>원래이름.age</code>로 저장)
-      <input type="file" id="file">
-    </label>
-    <label>비밀번호 확인 (암호화할 때만)
-      <input type="password" id="pass2" autocomplete="off" spellcheck="false">
-    </label>
-    <button type="button" id="encrypt">암호화 후 업로드</button>
-
-    <h2>풀어서 내려받기</h2>
-    <p class="gw-note" id="selected">위 목록에서 .age 파일을 선택하세요.</p>
-    <button type="button" id="decrypt" disabled>복호화 후 다운로드</button>
 
     <progress class="gw-progress" id="progress" max="1" value="0" hidden></progress>
-    <p class="gw-note" id="status" role="status"></p>
-    <a class="gw-link" href="/">파일 목록으로 돌아가기</a>
+    <p class="gw-status" id="status" role="status"></p>
   </main>
 </body>
 </html>

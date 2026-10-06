@@ -1,0 +1,302 @@
+/* Quantum(파일 목록 화면) 테마. Nginx가 Quantum HTML의 </head> 앞에 이 파일을 끼워 넣는다.
+   Quantum은 색을 CSS 변수로 관리하므로 변수 위주로 덮어쓰고, 구조 변경은 최소로 한다.
+   선택자 특이도를 Quantum보다 높이려고 html 을 앞에 붙인다.
+
+   주의: Quantum은 다크 테마일 때 본문/사이드바에는 .dark-mode, 상단바/하단바에는 .dark-mode-header 를 붙인다.
+   둘 다 다크 변수를 받아야 아이콘이 배경에 묻히지 않는다. */
+
+/* Pretendard (vendor/fonts, SIL OFL 1.1) */
+@font-face {
+  font-family: "Pretendard Variable";
+  font-weight: 45 920;
+  font-style: normal;
+  font-display: swap;
+  src: url("/_gw/static/vendor/fonts/PretendardVariable.woff2") format("woff2-variations");
+}
+
+/* ---- 색 (라이트) ---- */
+html:root {
+  --blue: #6366f1;
+  --dark-blue: #4f46e5;
+  --icon-blue: #6366f1;
+  --background: #f6f7fb;
+  --alt-background: #eceef4;
+  --surfacePrimary: #ffffff;
+  --surfaceSecondary: #f1f2f6;
+  --divider: rgba(15, 23, 42, .1);
+  --textPrimary: #0f172a;
+  --textSecondary: #475569;
+  --iconBackground: #eef0f6;
+  --activeWhiteIcon: #0f172a;
+
+  --nas-border: rgba(15, 23, 42, .1);
+  --nas-hover: rgba(15, 23, 42, .04);
+  --nas-bar: #ffffff;
+
+  --nas-r-lg: 10px;   /* 카드, 창 */
+  --nas-r: 8px;       /* 파일 카드, 입력창 */
+  --nas-r-sm: 6px;    /* 버튼, 작은 요소 */
+
+  /* 전체 크기: Quantum은 rem 단위라 기준 글자 크기만 줄이면 전체가 같은 비율로 작아진다 (16px → 14px) */
+  font-size: 14px;
+}
+
+/* ---- 색 (다크) ---- */
+html .dark-mode,
+html .dark-mode-header {
+  --background: #0b0d14;
+  --alt-background: #1d2131;
+  --surfacePrimary: #151823;
+  --surfaceSecondary: #1d2131;
+  --divider: rgba(255, 255, 255, .09);
+  --textPrimary: #e8eaf2;
+  --textSecondary: #a3abbf;
+  --iconBackground: #1d2131;
+  --activeWhiteIcon: #e8eaf2;
+
+  --nas-border: rgba(255, 255, 255, .09);
+  --nas-hover: rgba(255, 255, 255, .05);
+  --nas-bar: #10131c;
+}
+
+/* ---- 글꼴: Pretendard ----
+   Quantum은 요소마다 글꼴을 지정해 두어서 전체에 !important 로 적용한다. 아이콘 글꼴(Material) 요소는 제외. */
+html body,
+html body *:not(.material-symbols):not(.material-icons):not(.material-symbols-outlined) {
+  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif !important;
+}
+html body {
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -.01em;
+}
+
+/* ---- 아이콘: Lucide ----
+   lucide-icons.js 가 Material 아이콘 요소에 data-lucide 와 --nas-lucide(SVG 주소)를 붙인다.
+   원래 글자 아이콘은 투명하게 숨기고, 같은 자리에 Lucide 아이콘을 겹쳐 그린다.
+   (요소 자체의 배경, 예: 파란 원 버튼은 그대로 유지) */
+html [data-lucide] {
+  position: relative;
+  -webkit-text-fill-color: transparent;
+  /* Quantum은 선택된 아이콘에 text-shadow 를 걸어서, 숨긴 글자 아이콘이 그림자로 드러난다 */
+  text-shadow: none !important;
+}
+html [data-lucide]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 1em;
+  height: 1em;
+  max-width: 100%;
+  max-height: 100%;
+  background-color: currentColor;
+  -webkit-mask: var(--nas-lucide) center / contain no-repeat;
+  mask: var(--nas-lucide) center / contain no-repeat;
+  pointer-events: none;
+}
+
+/* ---- 상단 바, 하단 상태 바: 선 없이 배경색으로만 구분 ----
+   Quantum이 header 배경에 !important 를 걸어 두었고, 상단바/하단바(와 안쪽 요소)에
+   backdrop-filter: blur() invert(.1) 을 걸어 흰 배경을 회색으로 탁하게 만든다. 둘 다 덮어쓴다. */
+html header.flexbar,
+html #status-bar,
+html #status-bar.active {
+  background: var(--nas-bar) !important;
+  border: 0 !important;
+  border-radius: 0;
+  color: var(--textPrimary);
+}
+html #status-bar { color: var(--textSecondary); }
+html header.flexbar,
+html header.flexbar *,
+html #status-bar,
+html #status-bar * {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* 상단 바 아이콘: 햄버거(SVG 선)와 아이콘 글꼴 모두 본문 글자색으로 */
+html header.flexbar .ham .line { stroke: var(--textPrimary); }
+html header.flexbar .action,
+html header.flexbar .action i { color: var(--textPrimary); }
+html header.flexbar .action:hover { background: var(--nas-hover); }
+
+/* 검색창: 테두리 없이 채운 배경. Quantum 선택자(.search-bar-container[data-v-…])보다 우선하도록 클래스를 두 번 쓴다 */
+html .search-bar-container.search-bar-container {
+  background: var(--surfaceSecondary);
+  border: 0;
+  border-radius: var(--nas-r);
+  box-shadow: none;
+}
+
+/* ---- 사이드바: 불투명 배경 (햄버거로 열었을 때 뒤가 비치지 않게) ----
+   Quantum의 #sidebar 배경(반투명 + 블러)이 더 구체적인 선택자라 !important 로 덮는다. */
+html #sidebar,
+html #sidebar.active,
+html #sidebar.dark-mode {
+  background: var(--nas-bar) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 0;
+  box-shadow: none !important;
+}
+html #sidebar .card {
+  background: var(--surfaceSecondary) !important;
+  border: 0 !important;
+  border-radius: var(--nas-r-lg);
+  box-shadow: none !important;
+}
+html #sidebar i { color: var(--textPrimary); }
+html #sidebar .credits { display: none; }   /* 버전 표시 (계정 메뉴와 겹침) */
+
+/* 설정 화면의 선택된 메뉴: Quantum은 흰 글자로 표시하므로 배경을 포인트 색으로 */
+html #sidebar .card.active-settings {
+  background: var(--blue) !important;
+  color: #fff !important;
+}
+html #sidebar .card.active-settings i,
+html #sidebar .card.active-settings span { color: #fff !important; }
+
+/* 사이드바 위쪽 카드: [사용자 줄] 아래에 [작은 토글 3개 ··· + 파일 작업] 을 한 줄로 */
+html #sidebar .headline-card {
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: .5rem;
+  row-gap: .5rem;
+}
+html #sidebar .headline-card > .card-wrapper { flex: 0 0 auto; width: auto; margin: 0; padding: 0; }
+html #sidebar .headline-card > .card-wrapper.user-card { flex: 1 0 100%; }
+/* + 파일 작업 버튼은 오른쪽 끝으로 (맨 뒤에 빈 div가 있어서 :last-of-type 대신 :has 로 지정) */
+html #sidebar .headline-card > .card-wrapper:has(.file-actions) { margin-left: auto; }
+
+/* 사이드바 아이콘 크기 통일: 사용자 줄(사람/설정/로그아웃), 링크 카드(집/연필/도구) */
+html #sidebar .user-card i,
+html #sidebar .logout-button i,
+html #sidebar .sidebar-links i {
+  font-size: 1.2rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+}
+html #sidebar .user-card .action,
+html #sidebar .logout-button { min-height: 0; padding: 0; }
+
+/* 토글 3개 (한 번 클릭 열기, 테마, 사이드바 고정): 큰 원 → 작은 사각 버튼 */
+html #sidebar .quick-toggles {
+  display: flex !important;
+  justify-content: flex-start !important;
+  gap: .25rem !important;
+  width: auto !important;
+  padding: 0 !important;
+}
+html #sidebar .quick-toggles div.clickable {
+  width: 2.25rem;
+  height: 2.25rem;
+  display: grid;
+  place-items: center;
+  border-radius: var(--nas-r-sm) !important;
+  background: transparent !important;
+  transition: background .12s;
+}
+html #sidebar .quick-toggles div.clickable:hover { background: var(--nas-hover) !important; }
+html #sidebar .quick-toggles div.clickable.active { background: color-mix(in srgb, var(--blue) 16%, transparent) !important; }
+html #sidebar .quick-toggles div i {
+  font-size: 1.2rem;
+  padding: 0;
+  background: transparent !important;
+}
+html #sidebar .quick-toggles div.clickable.active i { color: var(--blue) !important; }
+
+/* 설정 화면 토글 스위치 (Quantum ToggleSwitch.vue)
+   원래는 바탕 너비가 em(글자 크기 비례)이고 동그라미 위치·이동 거리는 px 고정이라,
+   기준 글자 크기를 14px로 줄이면 켜졌을 때 동그라미가 바탕 밖으로 나간다 → 전부 px 로 통일.
+   Quantum 스타일이 scoped(data-v) 선택자라 !important 사용 */
+html .switch {
+  width: 40px !important;
+  height: 22px !important;
+  padding: 0 !important;
+}
+html .switch .slider {
+  background-color: #cbd5e1 !important;
+  border-radius: 999px !important;
+  transition: background-color .2s !important;
+}
+html .dark-mode .switch .slider { background-color: #3a3f52 !important; }
+html .switch .slider:before {
+  width: 16px !important;
+  height: 16px !important;
+  left: 3px !important;
+  bottom: 3px !important;
+  border-radius: 50% !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .25);
+  transition: transform .2s !important;
+}
+html .switch input:checked + .slider { background-color: var(--blue) !important; }
+html .switch input:checked + .slider:before { transform: translateX(18px) !important; }
+html .switch input:focus-visible + .slider { box-shadow: 0 0 0 3px color-mix(in srgb, var(--blue) 30%, transparent) !important; }
+
+/* + 파일 작업 버튼 */
+html #sidebar .file-actions {
+  height: 2.25rem;
+  padding: 0 .75rem;
+  border-radius: var(--nas-r-sm);
+  background: var(--surfacePrimary);
+}
+html #sidebar .file-actions:hover { background: var(--nas-hover); }
+
+/* ---- 본문 ---- */
+html #main { background: var(--background); }
+
+html .card {
+  border-radius: var(--nas-r-lg);
+  box-shadow: none;
+}
+
+/* 이름/크기/수정일 정렬 줄: 카드 모양(위만 둥근 상자)을 없애고 글자만 남긴다.
+   Quantum 선택자가 더 구체적이라 !important */
+html .listing-item-header,
+html .listing-item-header.card {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: var(--textSecondary);
+}
+
+/* 파일/폴더 항목: 테두리 없이 배경색만. 마우스 올림/선택은 색으로 표시 */
+html .listing-item {
+  background: var(--surfacePrimary);
+  border: 1px solid transparent !important;
+  border-radius: var(--nas-r);
+  box-shadow: none !important;
+  transition: background .12s;
+}
+html .listing-item:hover {
+  background: color-mix(in srgb, var(--blue) 8%, var(--surfacePrimary));
+}
+html .listing-item[aria-selected="true"],
+html .listing-item.selected {
+  background: color-mix(in srgb, var(--blue) 18%, var(--surfacePrimary));
+  border-color: color-mix(in srgb, var(--blue) 60%, transparent) !important;
+}
+/* 파일 카드 안 아이콘/썸네일 상자 */
+html .listing-item img,
+html .listing-item .icon,
+html .listing-item i { border-radius: var(--nas-r-sm); }
+
+/* ---- 떠 있는 창 (삭제 확인, 공유 등) ---- */
+html .floating-window {
+  border: 1px solid var(--nas-border);
+  border-radius: var(--nas-r-lg);
+  box-shadow: 0 24px 64px -16px rgba(0, 0, 0, .45);
+}
+
+/* ---- 버튼, 입력 ---- */
+html .button { border-radius: var(--nas-r-sm); }
+html .action { border-radius: var(--nas-r-sm); }
+html input,
+html select,
+html textarea { border-radius: var(--nas-r); }

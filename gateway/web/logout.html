@@ -4,15 +4,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>로그아웃</title>
+  <meta name="color-scheme" content="light dark">
+  <title>로그아웃 · My NAS</title>
   <link rel="stylesheet" href="/_gw/static/gw.css">
 </head>
 <body class="gw-center">
   <form class="gw-card" method="post" action="/_gw/logout">
-    <h1>로그아웃</h1>
-    <p class="gw-note">로그아웃하면 이 네트워크에 지정된 계정으로 돌아가거나, 지정된 계정이 없으면 로그인 화면으로 이동합니다.</p>
-    <button type="submit">로그아웃</button>
-    <a class="gw-link" href="/">취소</a>
+    <div class="gw-brand">
+      <div class="gw-logo" aria-hidden="true">
+        <svg class="lucide lucide-log-out" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ><path d="m16 17 5-5-5-5" /><path d="M21 12H9" /><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /></svg>
+      </div>
+    </div>
+    <button class="gw-btn" type="submit">로그아웃</button>
+    <a class="gw-btn secondary" href="/">취소</a>
   </form>
 </body>
 </html>

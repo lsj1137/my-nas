@@ -57,7 +57,7 @@ cp gateway/config.example.yaml gateway/config.yaml
 | 파일 | 수정할 것 |
 |---|---|
 | `.env` | `FILEBROWSER_JWT_TOKEN_SECRET`에 `openssl rand -hex 48` 결과 |
-| `filebrowser/config.yaml` | `externalUrl`, `logoutRedirectUrl`의 도메인, `adminUsername`(개인 계정 이름) |
+| `filebrowser/config.yaml` | `adminUsername`(개인 계정 이름). 도메인은 쓰지 않는다 |
 | `gateway/config.yaml` | `public_origin`, `ip_map`, `users` |
 
 `filebrowser/config.yaml`은 **반드시 컨테이너를 띄우기 전에** 만들어야 한다. 없으면 Docker가 같은 이름의 빈 폴더를 만들어 버린다.

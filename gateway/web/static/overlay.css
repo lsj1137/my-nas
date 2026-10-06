@@ -1,68 +1,198 @@
+/* Quantum 화면 위에 올라가는 계정 메뉴. Quantum 스타일과 섞이지 않도록 #nas-overlay 아래로만 적용한다. */
+
 #nas-overlay {
+  --nas-bg: rgba(255, 255, 255, .82);
+  --nas-solid: #ffffff;
+  --nas-hover: rgba(15, 23, 42, .05);
+  --nas-border: rgba(15, 23, 42, .1);
+  --nas-text: #0f172a;
+  --nas-muted: #64748b;
+  --nas-accent: #6366f1;
+  --nas-danger: #e11d48;
+  --nas-shadow: 0 1px 2px rgba(15, 23, 42, .06), 0 18px 40px -14px rgba(15, 23, 42, .3);
+
   position: fixed;
-  left: 12px;
-  bottom: 12px;
+  left: 16px;
+  bottom: 56px;   /* Quantum 하단 상태 바(약 40px) 위 */
   z-index: 2147483000;
-  font: 14px/1.4 system-ui, -apple-system, "Segoe UI", "Malgun Gothic", sans-serif;
+  font: 500 13px/1.4 "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  color: var(--nas-text);
+  -webkit-font-smoothing: antialiased;
 }
 
+/* 다크 테마: Quantum 테마를 따른다 (overlay.js가 nas-dark / nas-light 클래스를 붙임).
+   Quantum 화면이 아닌 곳에서는 시스템 설정을 따른다. */
+#nas-overlay.nas-dark {
+  --nas-bg: rgba(30, 38, 46, .86);
+  --nas-solid: #1e262e;
+  --nas-hover: rgba(255, 255, 255, .06);
+  --nas-border: rgba(255, 255, 255, .1);
+  --nas-text: #e8eaf2;
+  --nas-muted: #9aa3b8;
+  --nas-accent: #818cf8;
+  --nas-danger: #fb7185;
+  --nas-shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 18px 40px -14px rgba(0, 0, 0, .7);
+}
+@media (prefers-color-scheme: dark) {
+  #nas-overlay:not(.nas-light) {
+    --nas-bg: rgba(30, 38, 46, .86);
+    --nas-solid: #1e262e;
+    --nas-hover: rgba(255, 255, 255, .06);
+    --nas-border: rgba(255, 255, 255, .1);
+    --nas-text: #e8eaf2;
+    --nas-muted: #9aa3b8;
+    --nas-accent: #818cf8;
+    --nas-danger: #fb7185;
+    --nas-shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 18px 40px -14px rgba(0, 0, 0, .7);
+  }
+}
+
+#nas-overlay *, #nas-overlay *::before { box-sizing: border-box; }
+
+/* ---- 토글 버튼 ---- */
 #nas-overlay .nas-toggle {
-  padding: 6px 12px;
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 12px 0 4px;
   border-radius: 999px;
-  border: 1px solid rgba(127, 127, 127, .35);
-  background: rgba(30, 30, 30, .85);
-  color: #fff;
   cursor: pointer;
+  background: var(--nas-bg);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  border: 1px solid var(--nas-border);
+  box-shadow: var(--nas-shadow);
+  color: var(--nas-text);
+  font-weight: 600;
+  transition: transform .15s, box-shadow .15s;
+}
+#nas-overlay .nas-toggle:hover { transform: translateY(-1px); }
+#nas-overlay .nas-toggle:focus-visible { outline: 2px solid var(--nas-accent); outline-offset: 2px; }
+#nas-overlay .nas-toggle::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  margin-left: 2px;
+  border-right: 2px solid var(--nas-muted);
+  border-bottom: 2px solid var(--nas-muted);
+  transform: rotate(-135deg) translate(-1px, -1px);
+  transition: transform .2s;
+}
+#nas-overlay.open .nas-toggle::after { transform: rotate(45deg) translate(-2px, -2px); }
+
+#nas-overlay .nas-avatar {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #818cf8, #6366f1 50%, #a855f7);
 }
 
+/* ---- 메뉴 ---- */
 #nas-overlay .nas-menu {
-  display: none;
   position: absolute;
   left: 0;
-  bottom: calc(100% + 8px);
-  min-width: 200px;
+  bottom: calc(100% + 10px);
+  min-width: 220px;
   padding: 6px;
-  border-radius: 10px;
-  border: 1px solid rgba(127, 127, 127, .35);
-  background: #1f2328;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, .3);
-}
-
-#nas-overlay.open .nas-menu { display: flex; flex-direction: column; }
-
-#nas-overlay .nas-who {
+  border-radius: 16px;
+  background: var(--nas-bg);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid var(--nas-border);
+  box-shadow: var(--nas-shadow);
   display: flex;
   flex-direction: column;
-  padding: 6px 10px 8px;
-  color: #e6edf3;
-  border-bottom: 1px solid rgba(127, 127, 127, .3);
-  margin-bottom: 4px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(6px) scale(.98);
+  transform-origin: bottom left;
+  transition: opacity .16s, transform .16s, visibility .16s;
 }
+#nas-overlay.open .nas-menu { opacity: 1; visibility: visible; transform: none; }
 
-#nas-overlay .nas-who span { font-size: 12px; color: #9198a1; }
+#nas-overlay .nas-who { display: flex; align-items: center; gap: 10px; padding: 10px; }
+#nas-overlay .nas-who .nas-avatar { width: 36px; height: 36px; font-size: 15px; }
+#nas-overlay .nas-who > div { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; }
+#nas-overlay .nas-who strong { font-size: 15px; font-weight: 700; }
 
-#nas-overlay .nas-menu a,
-#nas-overlay .nas-menu button {
-  display: block;
-  text-align: left;
-  padding: 8px 10px;
-  border: 0;
-  border-radius: 6px;
-  background: transparent;
-  color: #e6edf3;
-  text-decoration: none;
-  font: inherit;
-  cursor: pointer;
-}
-
-#nas-overlay .nas-menu a:hover,
-#nas-overlay .nas-menu button:hover { background: rgba(127, 127, 127, .2); }
-
-.nas-delete-warning {
-  margin: 10px 0 0;
-  padding: 8px 10px;
-  border-radius: 6px;
-  background: rgba(198, 40, 40, .12);
-  color: #c62828;
+#nas-overlay .nas-badge {
+  font-size: 11px;
   font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  color: var(--nas-accent);
+  background: color-mix(in srgb, var(--nas-accent) 14%, transparent);
+}
+#nas-overlay .nas-badge.ip { color: #059669; background: rgba(5, 150, 105, .12); }
+
+#nas-overlay .nas-sep { height: 1px; margin: 4px 6px; background: var(--nas-border); }
+
+#nas-overlay .nas-item {
+  all: unset;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--nas-text);
+  font-weight: 500;
+}
+#nas-overlay .nas-item:hover, #nas-overlay .nas-item:focus-visible { background: var(--nas-hover); }
+#nas-overlay .nas-item::before {
+  content: "";
+  flex: none;
+  width: 17px;
+  height: 17px;
+  background: var(--nas-muted);
+  -webkit-mask: var(--nas-icon) center / contain no-repeat;
+  mask: var(--nas-icon) center / contain no-repeat;
+}
+#nas-overlay .nas-icon-logout, #nas-overlay .nas-icon-devices { color: var(--nas-danger); }
+#nas-overlay .nas-icon-logout::before, #nas-overlay .nas-icon-devices::before { background: var(--nas-danger); }
+
+#nas-overlay .nas-icon-lock { --nas-icon: url("/_gw/static/vendor/lucide/lock.svg"); }
+#nas-overlay .nas-icon-switch { --nas-icon: url("/_gw/static/vendor/lucide/arrow-left-right.svg"); }
+#nas-overlay .nas-icon-logout { --nas-icon: url("/_gw/static/vendor/lucide/log-out.svg"); }
+#nas-overlay .nas-icon-devices { --nas-icon: url("/_gw/static/vendor/lucide/monitor-smartphone.svg"); }
+
+/* ---- 삭제 확인 창 경고 (Quantum 창 안에 들어감) ---- */
+.nas-delete-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(225, 29, 72, .1);
+  color: #e11d48;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+.nas-delete-warning::before {
+  content: "";
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+  background: currentColor;
+  -webkit-mask: url("/_gw/static/vendor/lucide/triangle-alert.svg") center / contain no-repeat;
+  mask: url("/_gw/static/vendor/lucide/triangle-alert.svg") center / contain no-repeat;
+}
+/* Quantum 삭제 창은 다크 테마일 때 dark-mode 클래스를 가진다 */
+.dark-mode .nas-delete-warning { background: rgba(251, 113, 133, .12); color: #fb7185; }
+
+/* 모바일: 하단 여백 확보 */
+@media (max-width: 640px) {
+  #nas-overlay { left: 12px; bottom: 52px; }
+  #nas-overlay .nas-name { max-width: 96px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 }

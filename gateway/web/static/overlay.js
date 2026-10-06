@@ -69,25 +69,44 @@
         if (root && !root.contains(e.target)) root.classList.remove("open");
       });
     }
-    const viaText = me.via === "session" ? "로그인됨" : "IP 자동 접속";
+    const viaText = me.via === "session" ? "로그인" : "자동";
+    const avatar = () => el("span", { class: "nas-avatar", "aria-hidden": "true" }, me.user.slice(0, 1).toUpperCase());
+    const item = (tag, attrs, icon, label) => el(tag, { ...attrs, class: `nas-item nas-icon-${icon}` }, label);
+
     const items = [
-      el("div", { class: "nas-who" }, el("strong", {}, me.user), el("span", {}, viaText)),
-      el("a", { href: "/_gw/vault" }, "암호화 보관함"),
-      el("a", { href: "/_gw/login" }, "다른 계정으로 전환"),
+      el("div", { class: "nas-who" }, avatar(), el("div", {}, el("strong", {}, me.user), el("span", { class: `nas-badge ${me.via}` }, viaText))),
+      el("div", { class: "nas-sep" }),
+      item("a", { href: "/_gw/vault" }, "lock", "보관함"),
+      item("a", { href: "/_gw/login" }, "switch", "계정 전환"),
     ];
     if (me.via === "session") {
-      items.push(el("button", { type: "button", onclick: () => postTo("/_gw/logout") }, "로그아웃"));
-      items.push(el("button", { type: "button", onclick: () => postTo("/_gw/logout-all") }, "모든 기기에서 로그아웃"));
+      items.push(el("div", { class: "nas-sep" }));
+      items.push(item("button", { type: "button", onclick: () => postTo("/_gw/logout") }, "logout", "로그아웃"));
+      items.push(item("button", { type: "button", onclick: () => postTo("/_gw/logout-all") }, "devices", "전체 로그아웃"));
     }
     root.replaceChildren(
-      el("button", { type: "button", class: "nas-toggle", "aria-label": "계정 메뉴", onclick: () => root.classList.toggle("open") }, me.user),
-      el("div", { class: "nas-menu" }, ...items),
+      el("button", { type: "button", class: "nas-toggle", "aria-label": "계정 메뉴", "aria-haspopup": "menu", onclick: () => root.classList.toggle("open") },
+        avatar(), el("span", { class: "nas-name" }, me.user)),
+      el("div", { class: "nas-menu", role: "menu" }, ...items),
     );
+    syncTheme();
   }
+
+  // ---- Quantum 테마 따라가기 ----
+  // Quantum은 다크 테마일 때 #main 등에 dark-mode 클래스를 붙인다.
+  function syncTheme() {
+    if (!root) return;
+    const main = document.getElementById("main");
+    const dark = main ? main.classList.contains("dark-mode") : null;
+    root.classList.toggle("nas-dark", dark === true);
+    root.classList.toggle("nas-light", dark === false);
+  }
+
+  new MutationObserver(syncTheme).observe(document.documentElement, { subtree: true, attributes: true, attributeFilter: ["class"] });
 
   // ---- 삭제 확인 창 안내 ----
   const DELETE_DIALOG = '[aria-label="delete-prompt"]';
-  const WARNING_TEXT = "휴지통이 없어서 바로 영구 삭제됩니다. 되돌릴 수 없어요.";
+  const WARNING_TEXT = "영구 삭제 · 복구 불가";
 
   function decorateDeleteDialogs() {
     for (const dialog of document.querySelectorAll(DELETE_DIALOG)) {

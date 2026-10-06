@@ -1,0 +1,16 @@
+# 로컬 개발용 게이트웨이 설정. setup.sh 가 dev/gateway.yaml 로 복사한다 (gateway.yaml 은 git 제외).
+public_origin: https://nas.localhost:8443
+
+# 로컬에서는 브라우저 요청이 Docker 내부 주소(172.x.x.x)로 들어온다.
+# - 아래 매핑이 있으면: 로그인 없이 shared로 접속 (집 와이파이 상황)
+# - 주석 처리하면: 로그인 페이지가 뜸 (외부 접속 상황)
+# 바꾼 뒤: docker compose -f dev/docker-compose.yml kill -s HUP nas-gateway
+ip_map:
+  - cidr: 172.16.0.0/12
+    user: shared
+
+users:
+  owner:
+    password_hash: "$2a$12$KjCZQ/jLaPD.pOlJlz4.gecBC37Nist7HqvgOTKmTy6MP9aH1wE12"  # dev-password (개발 전용)
+  shared:
+    login: false
